@@ -22,7 +22,8 @@ export const useGameStore = defineStore('game', {
     boss: {
       card: null,
       hp: 0,
-      pawn: null
+      pawn: null,
+      tokens: []
     },
 
     // Shared grid (2D array)
@@ -103,7 +104,7 @@ export const useGameStore = defineStore('game', {
     resetGame() {
       this.players = []
       this.activePlayerIndex = 0
-      this.boss = { card: null, hp: 0, pawn: null }
+      this.boss = { card: null, hp: 0, pawn: null, tokens: [] }
       this.sharedGrid = []
       this.bossActionCards = []
       this.gameLog = []
@@ -159,10 +160,16 @@ export const useGameStore = defineStore('game', {
     setupBoss() {
       if (this.decks.boss.length > 0) {
         const bossCard = this.decks.boss.pop()
+        const bossTokens = [
+          { id: 'pawn_boss', type: 'pawn', color: '#1a1a1a', placed: false, position: null },
+          { id: 'marker1_boss', type: 'marker', color: '#1a1a1a', placed: false, position: null },
+          { id: 'marker2_boss', type: 'marker', color: '#1a1a1a', placed: false, position: null }
+        ]
         this.boss = {
           card: bossCard,
           hp: bossCard.hp,
-          pawn: { id: 'pawn_boss', type: 'pawn', color: '#1a1a1a', placed: false, position: null }
+          pawn: bossTokens[0],
+          tokens: bossTokens
         }
         this.addLog(`Boss appeared: ${bossCard.name}`)
       }
@@ -276,7 +283,7 @@ export const useGameStore = defineStore('game', {
       // Resolve token (boss or player)
       let token
       if (playerId === -1) {
-        token = this.boss.pawn
+        token = this.boss.tokens.find(t => t.id === tokenId)
       } else {
         const player = this.players.find(p => p.id === playerId)
         if (!player) return
@@ -291,12 +298,12 @@ export const useGameStore = defineStore('game', {
       if (cell.token) {
         // Swap: move the existing token to the dragged token's old position
         const existingToken = cell.token
-        const existingTokenRef = existingToken.id === 'pawn_boss'
-          ? this.boss.pawn
-          : (() => {
-              const ep = this.players.find(p => p.tokens.some(t => t.id === existingToken.id))
-              return ep?.tokens.find(t => t.id === existingToken.id)
-            })()
+        const existingTokenRef = (() => {
+          const bossToken = this.boss.tokens?.find(t => t.id === existingToken.id)
+          if (bossToken) return bossToken
+          const ep = this.players.find(p => p.tokens.some(t => t.id === existingToken.id))
+          return ep?.tokens.find(t => t.id === existingToken.id)
+        })()
         if (existingTokenRef) {
           if (fromRow !== null) {
             this.sharedGrid[fromRow][fromCol].token = existingToken
@@ -320,6 +327,27 @@ export const useGameStore = defineStore('game', {
 
       const ownerName = playerId === -1 ? 'Boss' : this.players.find(p => p.id === playerId)?.name
       this.addLog(`${ownerName} placed ${token.type} at (${row}, ${col})`)
+    },
+
+    // Remove token from grid and return to owner
+    unplaceToken(playerId, tokenId) {
+      let token
+      if (playerId === -1) {
+        token = this.boss.tokens.find(t => t.id === tokenId)
+      } else {
+        const player = this.players.find(p => p.id === playerId)
+        if (!player) return
+        token = player.tokens.find(t => t.id === tokenId)
+      }
+      if (!token || !token.placed) return
+
+      const { row, col } = token.position
+      this.sharedGrid[row][col].token = null
+      token.placed = false
+      token.position = null
+
+      const ownerName = playerId === -1 ? 'Boss' : this.players.find(p => p.id === playerId)?.name
+      this.addLog(`${ownerName}'s ${token.type} returned from grid`)
     },
 
     // Add log entry

@@ -12,7 +12,13 @@
       <!-- Unplaced Tokens -->
       <div class="tokens-section">
         <h4 class="section-title">Tokens</h4>
-        <div class="tokens-list">
+        <div
+          class="tokens-list"
+          :class="{ 'drop-target': isTokenAreaDragOver }"
+          @dragover.prevent="onTokenAreaDragOver"
+          @dragleave="onTokenAreaDragLeave"
+          @drop="onTokenAreaDrop"
+        >
           <Token
             v-for="token in unplacedTokens"
             :key="token.id"
@@ -73,6 +79,28 @@ const unplacedTokens = computed(() => {
   if (!activePlayer.value) return []
   return activePlayer.value.tokens.filter(t => !t.placed)
 })
+
+const isTokenAreaDragOver = ref(false)
+
+function onTokenAreaDragOver() {
+  isTokenAreaDragOver.value = true
+}
+
+function onTokenAreaDragLeave() {
+  isTokenAreaDragOver.value = false
+}
+
+function onTokenAreaDrop(event) {
+  isTokenAreaDragOver.value = false
+  try {
+    const data = JSON.parse(event.dataTransfer.getData('application/json'))
+    if (data.type === 'token' && data.playerId === activePlayer.value.id) {
+      gameStore.unplaceToken(data.playerId, data.tokenId)
+    }
+  } catch (e) {
+    console.error('Drop error:', e)
+  }
+}
 
 const handCards = computed({
   get: () => activePlayer.value?.hand || [],
@@ -187,6 +215,11 @@ function hideTooltip() {
   font-size: 11px;
   color: #95a5a6;
   font-style: italic;
+}
+
+.tokens-list.drop-target {
+  background: #d5f5e3;
+  outline: 2px dashed #27ae60;
 }
 
 .hand-section {

@@ -12,9 +12,23 @@
             <button @click="updateHP(1)" class="btn-plus">+</button>
           </div>
         </div>
-        <div class="boss-pawn-section" v-if="boss.pawn">
-          <span class="stat-label">Pawn</span>
-          <Token :token="boss.pawn" :player-id="-1" />
+        <div class="boss-tokens-section" v-if="boss.tokens && boss.tokens.length">
+          <span class="stat-label">Tokens</span>
+          <div
+            class="boss-tokens-list"
+            :class="{ 'drop-target': isTokenAreaDragOver }"
+            @dragover.prevent="onTokenAreaDragOver"
+            @dragleave="onTokenAreaDragLeave"
+            @drop="onTokenAreaDrop"
+          >
+            <Token
+              v-for="token in unplacedBossTokens"
+              :key="token.id"
+              :token="token"
+              :player-id="-1"
+            />
+            <span v-if="unplacedBossTokens.length === 0" class="empty-message">All placed</span>
+          </div>
         </div>
         <div class="boss-abilities" v-if="boss.card.abilities">
           <span class="ability" v-for="(ability, idx) in boss.card.abilities" :key="idx">
@@ -28,13 +42,39 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import Card from './Card.vue'
 import Token from './Token.vue'
 
 const gameStore = useGameStore()
 const boss = computed(() => gameStore.boss)
+
+const unplacedBossTokens = computed(() =>
+  boss.value.tokens?.filter(t => !t.placed) || []
+)
+
+const isTokenAreaDragOver = ref(false)
+
+function onTokenAreaDragOver() {
+  isTokenAreaDragOver.value = true
+}
+
+function onTokenAreaDragLeave() {
+  isTokenAreaDragOver.value = false
+}
+
+function onTokenAreaDrop(event) {
+  isTokenAreaDragOver.value = false
+  try {
+    const data = JSON.parse(event.dataTransfer.getData('application/json'))
+    if (data.type === 'token' && data.playerId === -1) {
+      gameStore.unplaceToken(-1, data.tokenId)
+    }
+  } catch (e) {
+    console.error('Drop error:', e)
+  }
+}
 
 function updateHP(delta) {
   gameStore.updateBossHP(delta)
@@ -128,11 +168,31 @@ function resetBossActions() {
   opacity: 0.8;
 }
 
-.boss-pawn-section {
+.boss-tokens-section {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin-top: 4px;
+}
+
+.boss-tokens-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 28px;
+}
+
+.empty-message {
+  font-size: 11px;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.boss-tokens-list.drop-target {
+  background: rgba(255, 255, 255, 0.1);
+  outline: 2px dashed #bdc3c7;
+  border-radius: 4px;
 }
 
 .boss-abilities {

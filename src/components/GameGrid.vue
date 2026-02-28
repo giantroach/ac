@@ -67,7 +67,7 @@ function onDrop(event, row, col) {
 }
 
 function getTokenPlayerId(token) {
-  if (token.id === 'pawn_boss') return -1
+  if (gameStore.boss.tokens?.some(t => t.id === token.id)) return -1
   for (const player of gameStore.players) {
     if (player.tokens.some(t => t.id === token.id)) {
       return player.id
