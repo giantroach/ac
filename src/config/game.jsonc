@@ -7,5 +7,11 @@
   "maxPlayers": 4,
   "minPlayers": 1,
   "startingCards": 3,
-  "playerColors": ["#e74c3c", "#3498db", "#2ecc71", "#f39c12"]
+  "playerColors": ["#e74c3c", "#3498db", "#2ecc71", "#f39c12"],
+  "cardBorderColors": {
+    "ac": "#3498db",
+    "boss": "#e74c3c",
+    "action": "#2ecc71",
+    "boss-action": "#9b59b6"
+  }
 }

@@ -5,6 +5,7 @@ import coresData from '@/config/cores.jsonc'
 import acCardsData from '@/config/cards-ac.jsonc'
 import bossCardsData from '@/config/cards-boss.jsonc'
 import actionCardsData from '@/config/cards-action.jsonc'
+import bossActionCardsData from '@/config/cards-boss-action.jsonc'
 
 export const useGameStore = defineStore('game', {
   state: () => ({
@@ -35,8 +36,12 @@ export const useGameStore = defineStore('game', {
     decks: {
       ac: [],
       boss: [],
-      action: []
+      action: [],
+      bossAction: []
     },
+
+    // Boss action cards row (separate from the grid)
+    bossActionCards: [],
 
     // Config references
     config: gameConfig,
@@ -48,7 +53,8 @@ export const useGameStore = defineStore('game', {
     activePlayer: (state) => state.players[state.activePlayerIndex],
     playerCount: (state) => state.players.length,
     gridRows: (state) => state.config.grid.rows,
-    gridCols: (state) => state.config.grid.cols
+    gridCols: (state) => state.config.grid.cols,
+    cardBorderColors: (state) => state.config.cardBorderColors
   },
 
   actions: {
@@ -61,6 +67,9 @@ export const useGameStore = defineStore('game', {
 
       // Initialize decks
       this.initDecks()
+
+      // Place boss action cards on shared grid
+      this.setupBossActionCards()
 
       // Create players
       for (let i = 0; i < playerCount; i++) {
@@ -96,8 +105,9 @@ export const useGameStore = defineStore('game', {
       this.activePlayerIndex = 0
       this.boss = { card: null, hp: 0, pawn: null }
       this.sharedGrid = []
+      this.bossActionCards = []
       this.gameLog = []
-      this.decks = { ac: [], boss: [], action: [] }
+      this.decks = { ac: [], boss: [], action: [], bossAction: [] }
     },
 
     initGrid() {
@@ -119,6 +129,8 @@ export const useGameStore = defineStore('game', {
       this.decks.boss = this.shuffle([...bossCardsData.cards])
       // Action cards (not shuffled, each player gets one of each)
       this.decks.action = [...actionCardsData.cards]
+      // Boss action cards (stored as original, shuffled on placement)
+      this.decks.bossAction = [...bossActionCardsData.cards]
     },
 
     createPlayerTokens(playerIndex) {
@@ -169,6 +181,28 @@ export const useGameStore = defineStore('game', {
       }
     },
 
+    // Place boss action cards face-down in bossActionCards row
+    setupBossActionCards() {
+      const shuffled = this.shuffle([...this.decks.bossAction])
+      this.bossActionCards = shuffled.map(card => ({ ...card, faceUp: false, isBossAction: true }))
+      this.addLog('Boss action cards placed face-down')
+    },
+
+    // Reset boss action cards: re-shuffle and re-place
+    resetBossActionCards() {
+      this.bossActionCards = []
+      this.setupBossActionCards()
+      this.addLog('Boss action cards reset')
+    },
+
+    // Flip a boss action card by index
+    flipBossActionCard(index) {
+      const card = this.bossActionCards[index]
+      if (card) {
+        this.bossActionCards[index] = { ...card, faceUp: !card.faceUp }
+      }
+    },
+
     // Shuffle array
     shuffle(array) {
       const shuffled = [...array]
@@ -177,6 +211,12 @@ export const useGameStore = defineStore('game', {
         ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
       }
       return shuffled
+    },
+
+    // Set active player directly
+    setActivePlayer(playerId) {
+      this.activePlayerIndex = playerId
+      this.addLog(`${this.players[playerId].name}'s turn`)
     },
 
     // End turn
@@ -244,10 +284,12 @@ export const useGameStore = defineStore('game', {
       }
       if (!token) return
 
-      // Check if cell is occupied
       const cell = this.sharedGrid[row][col]
+      const fromRow = token.position?.row ?? null
+      const fromCol = token.position?.col ?? null
+
       if (cell.token) {
-        // Swap tokens
+        // Swap: move the existing token to the dragged token's old position
         const existingToken = cell.token
         const existingTokenRef = existingToken.id === 'pawn_boss'
           ? this.boss.pawn
@@ -256,22 +298,22 @@ export const useGameStore = defineStore('game', {
               return ep?.tokens.find(t => t.id === existingToken.id)
             })()
         if (existingTokenRef) {
-          if (token.position) {
-            this.sharedGrid[token.position.row][token.position.col].token = existingToken
-            existingTokenRef.position = { row: token.position.row, col: token.position.col }
+          if (fromRow !== null) {
+            this.sharedGrid[fromRow][fromCol].token = existingToken
+            existingTokenRef.position = { row: fromRow, col: fromCol }
           } else {
             existingTokenRef.placed = false
             existingTokenRef.position = null
           }
         }
+      } else {
+        // No swap needed: just vacate the old cell
+        if (fromRow !== null) {
+          this.sharedGrid[fromRow][fromCol].token = null
+        }
       }
 
-      // Clear old position
-      if (token.position) {
-        this.sharedGrid[token.position.row][token.position.col].token = null
-      }
-
-      // Place token
+      // Place token at destination
       this.sharedGrid[row][col].token = token
       token.placed = true
       token.position = { row, col }

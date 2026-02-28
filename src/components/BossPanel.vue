@@ -21,6 +21,7 @@
             {{ idx + 1 }}: {{ ability }}
           </span>
         </div>
+        <button class="btn-reset-action" @click="resetBossActions">Reset Actions</button>
       </div>
     </div>
   </div>
@@ -37,6 +38,10 @@ const boss = computed(() => gameStore.boss)
 
 function updateHP(delta) {
   gameStore.updateBossHP(delta)
+}
+
+function resetBossActions() {
+  gameStore.resetBossActionCards()
 }
 </script>
 
@@ -142,5 +147,23 @@ function updateHP(delta) {
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 11px;
+}
+
+.btn-reset-action {
+  margin-top: 8px;
+  width: 100%;
+  padding: 6px 0;
+  background: #8e44ad;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.btn-reset-action:hover {
+  opacity: 0.8;
 }
 </style>

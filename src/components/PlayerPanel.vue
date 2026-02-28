@@ -9,7 +9,7 @@
         :class="{ active: player.id === activePlayerId }"
         :style="{ '--player-color': player.color }"
       >
-        <div class="player-header">
+        <div class="player-header" @click="setActivePlayer(player.id)">
           <span class="player-indicator"></span>
           <span class="player-name">{{ player.name }}</span>
         </div>
@@ -55,6 +55,10 @@ function updateHP(playerId, delta) {
 function updateVP(playerId, delta) {
   gameStore.updateVP(playerId, delta)
 }
+
+function setActivePlayer(playerId) {
+  gameStore.setActivePlayer(playerId)
+}
 </script>
 
 <style scoped>
@@ -97,6 +101,11 @@ function updateVP(playerId, delta) {
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.player-header:hover .player-name {
+  color: #ecf0f1;
 }
 
 .player-indicator {

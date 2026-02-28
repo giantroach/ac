@@ -9,11 +9,18 @@
   >
     <div class="card-inner">
       <div class="card-front" v-if="faceUp">
-        <div class="card-header">
-          <span class="card-id">{{ card.id }}</span>
-          <span class="card-name">{{ card.name }}</span>
-        </div>
+        <template v-if="!isBossActionCard">
+          <div class="card-header">
+            <span class="card-id">{{ card.id }}</span>
+            <span class="card-name">{{ card.name }}</span>
+          </div>
+        </template>
         <div class="card-content">
+          <!-- Boss Action Card: id only -->
+          <template v-if="isBossActionCard">
+            <div class="boss-action-id">{{ card.id }}</div>
+          </template>
+
           <!-- AC Card Front: weapons -->
           <template v-if="isAcCard && card.front">
             <div class="weapons">
@@ -86,6 +93,10 @@ const props = defineProps({
   cardIndex: {
     type: Number,
     default: null
+  },
+  bossActionIndex: {
+    type: Number,
+    default: null
   }
 })
 
@@ -96,16 +107,27 @@ const gameStore = useGameStore()
 const isAcCard = computed(() => props.card.front && props.card.back)
 const isBossCard = computed(() => props.card.hp !== undefined && !props.card.isAction)
 const isActionCard = computed(() => props.card.isAction === true)
+const isBossActionCard = computed(() => props.card.isBossAction === true)
 
 const cardTypeClass = computed(() => {
   if (isAcCard.value) return 'ac-card'
   if (isBossCard.value) return 'boss-card'
   if (isActionCard.value) return 'action-card'
+  if (isBossActionCard.value) return 'boss-action-card'
   return ''
 })
 
+const borderColor = computed(() => {
+  const colors = gameStore.cardBorderColors
+  if (isAcCard.value) return colors?.ac ?? '#3498db'
+  if (isBossCard.value) return colors?.boss ?? '#e74c3c'
+  if (isActionCard.value) return colors?.action ?? '#2ecc71'
+  if (isBossActionCard.value) return colors?.['boss-action'] ?? '#9b59b6'
+  return '#2c3e50'
+})
+
 const cardStyle = computed(() => ({
-  '--card-color': props.card.color || '#2c3e50'
+  '--card-color': props.card.color || borderColor.value
 }))
 
 function getWeapon(weaponId) {
@@ -125,7 +147,9 @@ function getCoreName(coreId) {
 }
 
 function handleFlip() {
-  if (props.playerId !== null && props.cardIndex !== null) {
+  if (props.bossActionIndex !== null) {
+    gameStore.flipBossActionCard(props.bossActionIndex)
+  } else if (props.playerId !== null && props.cardIndex !== null) {
     gameStore.flipCard(props.playerId, props.cardIndex)
   }
   emit('flip')
@@ -317,5 +341,19 @@ function hideTooltip() {
 
 .action-card {
   --card-color: #2ecc71;
+}
+
+.boss-action-card {
+  --card-color: #9b59b6;
+}
+
+.boss-action-id {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
 }
 </style>

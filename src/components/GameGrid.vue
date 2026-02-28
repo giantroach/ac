@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import Token from './Token.vue'
 

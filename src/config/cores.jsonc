@@ -4,7 +4,7 @@
     {
       "id": "firmeza",
       "name": "Firmeza",
-      "Hp": 6,
+      "hp": 6,
       "specialMove": "敵と逆方向へ移動し、回避を得る。",
       "specialPassive": "test test"
     },
