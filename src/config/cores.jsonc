@@ -1,0 +1,47 @@
+{
+  // Core definitions (card backs)
+  "cores": [
+    {
+      "id": "firmeza",
+      "name": "Firmeza",
+      "Hp": 6,
+      "specialMove": "敵と逆方向へ移動し、回避を得る。",
+      "specialPassive": "test test"
+    },
+    {
+      "id": "nachat",
+      "name": "Nacht",
+      "hp": 6,
+      "specialMove": "敵方向へ移動し、回避を得る。",
+      "specialPassive": ""
+    },
+    {
+      "id": "melander",
+      "name": "Melander",
+      "hp": 7,
+      "specialMove": "防御1とチャージを得る。",
+      "specialPassive": ""
+    },
+    {
+      "id": "mind_alpha",
+      "name": "Mind Alpha",
+      "hp": 7,
+      "specialMove": "敵方向へ移動し、メイン武装で攻撃する。",
+      "specialPassive": ""
+    },
+    {
+      "id": "open_faith",
+      "name": "Open Faith",
+      "hp": 8,
+      "specialMove": "防御1とチャージを得る。",
+      "specialPassive": ""
+    },
+    {
+      "id": "full_course",
+      "name": "Full Course",
+      "hp": 8,
+      "specialMove": "回避を得る。",
+      "specialPassive": ""
+    }
+  ]
+}

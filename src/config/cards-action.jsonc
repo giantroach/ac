@@ -1,0 +1,35 @@
+{
+  // Action Cards - blank back
+  "cards": [
+    {
+      "id": "action_move_right",
+      "name": "Right",
+      "type": "movement",
+      "description": "Move your pawn up to 2 spaces"
+    },
+    {
+      "id": "action_move_left",
+      "name": "Left",
+      "type": "combat",
+      "description": "Attack an enemy in range"
+    },
+    {
+      "id": "action_main_weapon",
+      "name": "Main Weapon",
+      "type": "defense",
+      "description": "Fire main weapon"
+    },
+    {
+      "id": "action_sub_weapon",
+      "name": "Sub weapon",
+      "type": "utility",
+      "description": "Fire sub weapon"
+    },
+    {
+      "id": "action_special",
+      "name": "Special",
+      "type": "utility",
+      "description": "Perform special move"
+    }
+  ]
+}

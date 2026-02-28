@@ -1,0 +1,47 @@
+{
+  // Weapon definitions
+  "weapons": [
+    {
+      "id": "pulse_blade",
+      "name": "Pulse Blade",
+      "attack": "2",
+      "range": "1 (2)",
+      "abilities": []
+    },
+    {
+      "id": "gatling_gun",
+      "name": "Gatling Gun",
+      "attack": "1",
+      "range": "1-2",
+      "abilities": []
+    },
+    {
+      "id": "shotgun",
+      "name": "Heavy Shotgun",
+      "attack": "2 / 1",
+      "range": "1-2",
+      "abilities": []
+    },
+    {
+      "id": "bazooka",
+      "name": "Bazooka",
+      "attack": "2",
+      "range": "2-3",
+      "abilities": []
+    },
+    {
+      "id": "lrb",
+      "name": "LRB",
+      "attack": "1 (2)",
+      "range": "1-3",
+      "abilities": []
+    },
+    {
+      "id": "granade",
+      "name": "Granade",
+      "attack": 2,
+      "range": "1-3",
+      "abilities": []
+    }
+  ]
+}

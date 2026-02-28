@@ -1,0 +1,18 @@
+{
+  // Boss Cards - blank back
+  "cards": [
+    {
+      "id": "juggernaut",
+      "name": "Juggernaut",
+      "hp": 20,
+      "attack": 4,
+      "abilities": [
+        "ダッシュx1, Atk 2",
+        "ダッシュx6, Atk 0",
+        "ダッシュx3, Atk 1",
+        "範囲2: 最も近い対象2つにAtk1"
+      ],
+      "description": "前方からの攻撃を無効"
+    }
+  ]
+}

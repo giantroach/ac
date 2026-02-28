@@ -1,0 +1,65 @@
+{
+  // AC Cards - Front: 2 weapons, Back: 1 core
+  "cards": [
+    {
+      "id": "ac_001",
+      "name": "Warrior Card A",
+      "front": {
+        "weapons": ["pulse_blade", "bazooka"]
+      },
+      "back": {
+        "core": "firmeza"
+      }
+    },
+    {
+      "id": "ac_002",
+      "name": "Mage Card A",
+      "front": {
+        "weapons": ["gatling_gun", "bazooka"]
+      },
+      "back": {
+        "core": "nachat"
+      }
+    },
+    {
+      "id": "ac_003",
+      "name": "Tank Card A",
+      "front": {
+        "weapons": ["pulse_blade", "lrb"]
+      },
+      "back": {
+        "core": "melander"
+      }
+    },
+    {
+      "id": "ac_004",
+      "name": "Rogue Card A",
+      "front": {
+        "weapons": ["gatling_gun", "granade"]
+      },
+      "back": {
+        "core": "mind_alpha"
+      }
+    },
+    {
+      "id": "ac_005",
+      "name": "Healer Card A",
+      "front": {
+        "weapons": ["shotgun", "lrb"]
+      },
+      "back": {
+        "core": "open_faith"
+      }
+    },
+    {
+      "id": "ac_006",
+      "name": "Warrior Card B",
+      "front": {
+        "weapons": ["shotgun", "granade"]
+      },
+      "back": {
+        "core": "full_course"
+      }
+    }
+  ]
+}
